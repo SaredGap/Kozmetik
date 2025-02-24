@@ -1,0 +1,142 @@
+/* Estilos generales */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #000; /* Negro */
+    color: #fff; /* Texto blanco */
+    text-align: center;
+    margin: 0;
+    padding: 20px;
+}
+
+/* Estilo para el logo */
+.logo {
+    width: 250px; /* Ajusta el tamaño según tu logo */
+    height: auto;
+    border-radius: 50%; /* Redondo si lo deseas */
+}
+
+/* Contenedor principal */
+.container {
+    width: 80%;
+    margin: auto;
+    padding: 20px;
+}
+
+/* Título principal (Horario) */
+h1 {
+    font-size: 32px;
+    font-weight: bold;
+    color: #ff4081; /* Rosa vibrante */
+    margin-bottom: 10px;
+    text-transform: uppercase;
+}
+
+/* Subtítulo (Agregar Nuevo Horario) */
+h2 {
+    font-size: 24px;
+    font-weight: bold;
+    color: #fff;
+    margin-top: 20px;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+/* Contenedor del formulario */
+.form-container {
+    background: rgba(255, 255, 255, 0.1); /* Blanco con transparencia */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(255, 64, 129, 0.5);
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Estilos para las tarjetas */
+.card {
+    background: rgba(255, 255, 255, 0.1); /* Blanco translúcido */
+    border: 1px solid rgba(255, 64, 129, 0.5); /* Borde rosa */
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 6px rgba(255, 64, 129, 0.3);
+    transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: scale(1.02);
+}
+
+/* Encabezados de cada tarjeta */
+.card-header {
+    font-weight: bold;
+    padding: 10px;
+    border-radius: 8px;
+    color: white;
+    text-align: center;
+}
+
+/* Colores por día */
+.card-header.lunes { background: rgba(255, 64, 129, 0.7); }
+.card-header.martes { background: rgba(255, 105, 180, 0.7); }
+.card-header.miércoles { background: rgba(255, 182, 193, 0.7); }
+.card-header.jueves { background: rgba(240, 98, 146, 0.7); }
+.card-header.viernes { background: rgba(244, 143, 177, 0.7); }
+.card-header.sábado { background: rgba(233, 30, 99, 0.7); }
+.card-header.domingo { background: rgba(252, 228, 236, 0.7); }
+
+/* Estilos para los horarios */
+.horario-item {
+    display: flex;
+    justify-content: space-between;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 8px;
+    border-radius: 5px;
+    margin-bottom: 5px;
+}
+
+/* Botones generales */
+button {
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+    font-size: 14px;
+}
+
+/* Botón Agregar Nuevo Horario */
+button.agregar {
+    background-color: #ff4081; /* Rosa fuerte */
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 12px 20px;
+    border-radius: 8px;
+    margin-top: 10px;
+    text-transform: uppercase;
+}
+
+button.agregar:hover {
+    background-color: #d81b60; /* Rosa oscuro */
+}
+
+/* Botón Borrar */
+button.borrar {
+    background-color: #000; /* Negro */
+    color: white;
+}
+
+button.borrar:hover {
+    background-color: #333; /* Negro más claro */
+}
+
+/* Botón Repetir */
+button.repetir {
+    background-color: white;
+    color: black;
+}
+
+button.repetir:hover {
+    background-color: #ff4081; /* Rosa */
+    color: white;
+}
