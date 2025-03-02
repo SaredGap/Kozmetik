@@ -146,47 +146,22 @@ function exportarExcel() {
         ws.push(fila);
     });
 
-    // Calcular las horas trabajadas por persona
-    const calcularHorasTrabajadas = (horaInicio, horaFin) => {
-        let inicio = new Date("1970/01/01 " + horaInicio);
-        let fin = new Date("1970/01/01 " + horaFin);
-        let diferencia = (fin - inicio) / (1000 * 60 * 60); // Diferencia en horas
-        return diferencia;
-    };
-
-    // Agregar un resumen de horas trabajadas por persona
-    let resumenHoras = [];
-    let personas = Array.from(new Set(tablaHorarios.map(item => item.Nombre))); // Obtener lista de personas únicas
-
-    personas.forEach(persona => {
-        let filaResumen = [persona];
-
-        dias.forEach(dia => {
-            let horasTrabajadasPorDia = tablaHorarios.filter(item => item.Nombre === persona && item.Día === dia)
-                .map(item => item.Hora.split(" - "))
-                .map(horas => calcularHorasTrabajadas(horas[0], horas[1]))
-                .reduce((total, horas) => total + horas, 0);
-            
-            filaResumen.push(horasTrabajadasPorDia);
-        });
-
-        resumenHoras.push(filaResumen);
-    });
-
-    // Agregar fila de resumen al final de los horarios
-    ws.push(["Total de horas", ...new Array(dias.length).fill("")]);
-    resumenHoras.forEach(fila => {
-        ws.push(fila);
-    });
-
-    // Crear una hoja de trabajo
+    // Crear un libro de trabajo y agregar la hoja
     let wb = XLSX.utils.book_new();
     let wsExcel = XLSX.utils.aoa_to_sheet(ws);
 
-    // Personalizar el estilo (celdas y bordes)
-    wsExcel['!cols'] = [{wch: 10}, {wch: 20}, {wch: 20}, {wch: 20}, {wch: 20}, {wch: 20}, {wch: 20}]; // Ancho de columnas
+    // Configurar los anchos de las columnas
+    wsExcel['!cols'] = [
+        {wch: 10},  // Ancho de columna para "Hora"
+        {wch: 15},  // Ancho de columna para "Lunes"
+        {wch: 15},  // Ancho de columna para "Martes"
+        {wch: 15},  // Ancho de columna para "Miércoles"
+        {wch: 15},  // Ancho de columna para "Jueves"
+        {wch: 15},  // Ancho de columna para "Viernes"
+        {wch: 15}   // Ancho de columna para "Sábado"
+    ];
 
-    // Crear un libro de trabajo y agregar la hoja
+    // Crear el libro y agregar la hoja
     XLSX.utils.book_append_sheet(wb, wsExcel, "Horarios");
 
     // Obtener la fecha actual
@@ -196,6 +171,7 @@ function exportarExcel() {
     // Descargar el archivo Excel
     XLSX.writeFile(wb, `Horarios_${fechaFormateada}.xlsx`);
 }
+
 
 // Función para borrar un horario
 function borrarHorario(index) {
