@@ -106,7 +106,13 @@ function exportarExcel() {
     }
 
     // Crear un objeto para almacenar horarios por persona, hora y día
-    let horariosPorPersona = {};
+    let horariosPorDia = {
+        lunes: {},
+        martes: {},
+        miércoles: {},
+        jueves: {},
+        viernes: {}
+    };
 
     // Verificar que los horarios estén bien estructurados
     const storedHorarios = JSON.parse(localStorage.getItem('horarios')) || [];
@@ -115,14 +121,11 @@ function exportarExcel() {
         return;
     }
 
+    // Recorremos los horarios almacenados y organizamos la información
     storedHorarios.forEach(horario => {
         const { persona, dia, hora } = horario;
-
-        // Asegurarnos de que tenemos un arreglo de personas para cada combinación de hora y día
-        if (!horariosPorPersona[dia]) horariosPorPersona[dia] = {};
-        if (!horariosPorPersona[dia][hora]) horariosPorPersona[dia][hora] = [];
-
-        horariosPorPersona[dia][hora].push(persona);
+        if (!horariosPorDia[dia][hora]) horariosPorDia[dia][hora] = [];
+        horariosPorDia[dia][hora].push(persona);
     });
 
     // Crear los encabezados para la tabla (horas y días de la semana)
@@ -135,8 +138,8 @@ function exportarExcel() {
 
         // Por cada día, agregamos las personas que tienen horarios para esa hora
         ["lunes", "martes", "miércoles", "jueves", "viernes"].forEach(dia => {
-            if (horariosPorPersona[dia] && horariosPorPersona[dia][hora]) {
-                fila.push(horariosPorPersona[dia][hora].join(', '));  // Unir los nombres con coma
+            if (horariosPorDia[dia] && horariosPorDia[dia][hora]) {
+                fila.push(horariosPorDia[dia][hora].join(', '));  // Unir los nombres con coma
             } else {
                 fila.push("");  // Si no hay personas para ese día y hora, dejamos vacío
             }
