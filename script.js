@@ -66,6 +66,7 @@ function cargarHorarios() {
     }
 }
 
+// Función para agregar un nuevo horario
 function agregarHorario() {
     const persona = document.getElementById("persona").value;
     const dia = document.getElementById("dia").value;
@@ -94,6 +95,7 @@ function agregarHorario() {
     cargarHorarios();
 }
 
+// Función para exportar los horarios a un archivo Excel
 function exportarExcel() {
     let tablaHorarios = [];
     document.querySelectorAll('.card').forEach(card => {
@@ -101,8 +103,8 @@ function exportarExcel() {
         let filas = card.querySelectorAll('.horario-item');
         
         filas.forEach(fila => {
-            let nombre = fila.querySelector('.nombre').innerText;
-            let hora = fila.querySelector('.hora').innerText;
+            let nombre = fila.querySelector('span').innerText.split(' - ')[0];
+            let hora = fila.querySelector('span').innerText.split(' - ')[1];
 
             tablaHorarios.push({ Día: dia, Nombre: nombre, Hora: hora });
         });
@@ -120,7 +122,7 @@ function exportarExcel() {
     XLSX.writeFile(wb, "Horarios.xlsx");
 }
 
-
+// Función para borrar un horario
 function borrarHorario(index) {
     const horarios = JSON.parse(localStorage.getItem('horarios')) || [];
     horarios.splice(index, 1); // Eliminar el horario en la posición indicada
@@ -161,9 +163,6 @@ function borrarTodosHorarios() {
         cargarHorarios(); // Recargar los horarios después de borrar
     }
 }
-
-
-
 
 // Cargar los horarios al iniciar la página
 window.onload = cargarHorarios;
