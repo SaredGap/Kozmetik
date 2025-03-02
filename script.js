@@ -135,31 +135,7 @@ function borrarTodosHorarios() {
     }
 }
 
-function exportarExcel() {
-    let tablaHorarios = [];
-    document.querySelectorAll('.card').forEach(card => {
-        let dia = card.querySelector('.card-header').innerText;
-        let filas = card.querySelectorAll('.horario-item');
-        
-        filas.forEach(fila => {
-            let nombre = fila.querySelector('.nombre').innerText;
-            let hora = fila.querySelector('.hora').innerText;
 
-            tablaHorarios.push({ Día: dia, Nombre: nombre, Hora: hora });
-        });
-    });
-
-    if (tablaHorarios.length === 0) {
-        alert("No hay horarios para exportar.");
-        return;
-    }
-
-    let ws = XLSX.utils.json_to_sheet(tablaHorarios);
-    let wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Horarios");
-
-    XLSX.writeFile(wb, "Horarios.xlsx");
-}
 
 
 // Cargar los horarios al iniciar la página
