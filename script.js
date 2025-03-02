@@ -115,13 +115,8 @@ function exportarExcel() {
         return;
     }
 
-    // Ordenar los horarios por hora si es necesario
-    tablaHorarios.sort((a, b) => {
-        return new Date("1970/01/01 " + a.Hora) - new Date("1970/01/01 " + b.Hora);
-    });
-
     // Crear la hoja de Excel
-    let ws = XLSX.utils.json_to_sheet(tablaHorarios, { header: ["Día", "Nombre", "Hora"] });
+    let ws = XLSX.utils.json_to_sheet(tablaHorarios);
 
     // 1. Añadir encabezados personalizados
     ws['!cols'] = [{wch: 10}, {wch: 25}, {wch: 10}]; // Ancho de las columnas
@@ -144,50 +139,31 @@ function exportarExcel() {
         }
     }
 
-    // 3. Agrupar Horarios por Día en columnas (horizontal)
-    let datosAgrupados = {
-        "Día": ["Hora", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"]
-    };
-
-    // Rellenar los horarios en columnas para los días
-    let horas = [];
-    tablaHorarios.forEach(item => {
-        let hora = item.Hora;
-        if (!horas.includes(hora)) {
-            horas.push(hora);
+    // 3. Agrupar Horarios por Día
+    let diaAnterior = '';
+    tablaHorarios.forEach((persona, index) => {
+        if (persona.Día !== diaAnterior) {
+            // Añadir una fila vacía como separación entre días
+            if (index > 0) {
+                tablaHorarios.splice(index, 0, { Día: '', Nombre: '', Hora: '' });
+            }
+            diaAnterior = persona.Día;
         }
-
-        // Añadir la persona en la celda correspondiente
-        if (!datosAgrupados[hora]) {
-            datosAgrupados[hora] = { "Hora": hora };
-        }
-
-        datosAgrupados[hora][item.Día] = item.Nombre;
     });
 
-    // Transformar los datos a formato adecuado para Excel
-    let filasAgrupadas = [];
-    horas.forEach(hora => {
-        let fila = { "Hora": hora };
-        ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"].forEach(dia => {
-            fila[dia] = datosAgrupados[hora] ? datosAgrupados[hora][dia] : '';
-        });
-        filasAgrupadas.push(fila);
-    });
-
-    // Crear la nueva hoja con los horarios horizontales
-    let wsAgrupado = XLSX.utils.json_to_sheet(filasAgrupadas);
-
+    // Volver a crear la hoja con los horarios agrupados por día
+    let wsAgrupado = XLSX.utils.json_to_sheet(tablaHorarios);
+    
     // 4. Alineación de texto (centrado)
-    for (let row = 0; row < filasAgrupadas.length + 1; row++) {
-        for (let col = 0; col < 7; col++) {
+    for (let row = 0; row < tablaHorarios.length + 1; row++) {
+        for (let col = 0; col < 3; col++) {
             wsAgrupado[XLSX.utils.encode_cell({ r: row, c: col })].s = {
                 alignment: { horizontal: "center", vertical: "center" }
             };
         }
     }
 
-    // 5. Crear un libro de trabajo y agregar la hoja con horarios horizontales
+    // 5. Crear un libro de trabajo y agregar la hoja con horarios agrupados
     let wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, wsAgrupado, "Horarios");
 
