@@ -105,47 +105,43 @@ function exportarExcel() {
         horasDelDia.push(i < 10 ? `0${i}:00` : `${i}:00`);
     }
 
-    // Crear el array de datos con los horarios por persona y día
-    document.querySelectorAll('.card').forEach(card => {
-        let dia = card.querySelector('.card-header').innerText;
-        let filas = card.querySelectorAll('.horario-item');
-        
-        filas.forEach(fila => {
-            let nombre = fila.querySelector('span').innerText.split(' - ')[0];
-            let hora = fila.querySelector('span').innerText.split(' - ')[1];
-            
-            // Asegurarnos de que estamos tratando con la hora correcta
-            const indexHora = horasDelDia.indexOf(hora);
-            if (indexHora !== -1) {
-                // Si la hora no está en el arreglo de horarios, la agregamos
-                if (!horarios[indexHora]) {
-                    horarios[indexHora] = { hora: horasDelDia[indexHora] };
-                }
-                // Asegurarnos de que el día existe en el horario
-                if (!horarios[indexHora][dia]) {
-                    horarios[indexHora][dia] = [];
-                }
-                horarios[indexHora][dia].push(nombre);
-            }
-        });
+    // Crear un objeto para almacenar horarios por persona, hora y día
+    let horariosPorPersona = {};
+
+    // Verificar que los horarios estén bien estructurados
+    const storedHorarios = JSON.parse(localStorage.getItem('horarios')) || [];
+    if (storedHorarios.length === 0) {
+        alert("No hay horarios en el LocalStorage.");
+        return;
+    }
+
+    storedHorarios.forEach(horario => {
+        const { persona, dia, hora } = horario;
+
+        // Asegurarnos de que tenemos un arreglo de personas para cada combinación de hora y día
+        if (!horariosPorPersona[dia]) horariosPorPersona[dia] = {};
+        if (!horariosPorPersona[dia][hora]) horariosPorPersona[dia][hora] = [];
+
+        horariosPorPersona[dia][hora].push(persona);
     });
 
     // Crear los encabezados para la tabla (horas y días de la semana)
-    const encabezado = ["Hora", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+    const encabezado = ["Hora", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];
     let tablaHorarios = [encabezado];
 
     // Llenar los datos de la tabla con la información de los horarios
     horasDelDia.forEach(hora => {
         let fila = [hora];  // Empezamos con la hora como primer valor de la fila
-        for (let dia of ["lunes", "martes", "miércoles", "jueves", "viernes", "sabado", "domingo"]) {
-            // Verificamos si tenemos personas asignadas para ese día y hora
-            const horario = horarios.find(h => h.hora === hora);
-            if (horario && horario[dia]) {
-                fila.push(horario[dia].join(', '));  // Si hay personas, las unimos por coma
+
+        // Por cada día, agregamos las personas que tienen horarios para esa hora
+        ["lunes", "martes", "miércoles", "jueves", "viernes"].forEach(dia => {
+            if (horariosPorPersona[dia] && horariosPorPersona[dia][hora]) {
+                fila.push(horariosPorPersona[dia][hora].join(', '));  // Unir los nombres con coma
             } else {
-                fila.push("");  // Si no hay personas, dejamos vacío
+                fila.push("");  // Si no hay personas para ese día y hora, dejamos vacío
             }
-        }
+        });
+
         tablaHorarios.push(fila);
     });
 
