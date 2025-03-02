@@ -95,81 +95,76 @@ function agregarHorario() {
     cargarHorarios();
 }
 
+// Función para exportar los horarios a un archivo Excel con el formato horizontal y mejor diseño
 function exportarExcel() {
-    let tablaHorarios = [];
-    let dias = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes'];
-    
-    // Crear un objeto para almacenar los horarios por día
-    let horariosPorDia = {
-        lunes: [],
-        martes: [],
-        miércoles: [],
-        jueves: [],
-        viernes: []
-    };
+    let horarios = [];
+    let horasDelDia = [];
 
-    // Obtener los horarios agrupados por día
+    // Recopilar todas las horas posibles (de 9 a 9)
+    for (let i = 9; i <= 21; i++) {
+        horasDelDia.push(i < 10 ? `0${i}:00` : `${i}:00`);
+    }
+
+    // Crear el array de datos con los horarios por persona y día
     document.querySelectorAll('.card').forEach(card => {
-        let dia = card.querySelector('.card-header').innerText.toLowerCase();
+        let dia = card.querySelector('.card-header').innerText;
         let filas = card.querySelectorAll('.horario-item');
         
         filas.forEach(fila => {
             let nombre = fila.querySelector('span').innerText.split(' - ')[0];
             let hora = fila.querySelector('span').innerText.split(' - ')[1];
-            if (horariosPorDia[dia]) {
-                horariosPorDia[dia].push({ nombre, hora });
+            
+            // Para cada persona, agregamos el nombre en el horario adecuado (en la columna de la hora correspondiente)
+            const indexHora = horasDelDia.indexOf(hora);
+            if (indexHora !== -1) {
+                if (!horarios[indexHora]) {
+                    horarios[indexHora] = { hora: horasDelDia[indexHora] };
+                }
+                if (!horarios[indexHora][dia]) {
+                    horarios[indexHora][dia] = [];
+                }
+                horarios[indexHora][dia].push(nombre);
             }
         });
     });
 
-    // Verificar si hay horarios para exportar
-    let hayDatos = false;
-    for (const dia of dias) {
-        if (horariosPorDia[dia].length > 0) {
-            hayDatos = true;
-            break;
+    // Crear los encabezados para la tabla (horas y días de la semana)
+    const encabezado = ["Hora", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+    let tablaHorarios = [encabezado];
+
+    // Llenar los datos de la tabla con la información de los horarios
+    horasDelDia.forEach(hora => {
+        let fila = [hora];  // Empezamos con la hora como primer valor de la fila
+        for (let dia of ["lunes", "martes", "miércoles", "jueves", "viernes", "sabado", "domingo"]) {
+            // Si hay personas para esa hora y día, las agregamos
+            const personas = horarios.find(h => h.hora === hora) && horarios.find(h => h.hora === hora)[dia];
+            fila.push(personas ? personas.join(', ') : "");  // Si no hay personas, dejamos vacío
         }
-    }
-    
-    if (!hayDatos) {
+        tablaHorarios.push(fila);
+    });
+
+    // Si no hay horarios para exportar
+    if (tablaHorarios.length <= 1) {
         alert("No hay horarios para exportar.");
         return;
     }
 
-    // Preparar los datos para la hoja de Excel
-    let encabezado = ['Hora', ...dias];
-    let filas = [];
+    // Crear la hoja de Excel con los horarios
+    let ws = XLSX.utils.aoa_to_sheet(tablaHorarios);
 
-    // Obtener las horas y agregar la información de cada día
-    let maxHoras = 0;
-    dias.forEach(dia => {
-        maxHoras = Math.max(maxHoras, horariosPorDia[dia].length);
-    });
+    // Personalizar el diseño (colores de encabezado, bordes, etc.)
+    const encabezadoColor = { font: { bold: true, color: { rgb: "FFFFFF" } }, fill: { fgColor: { rgb: "4CAF50" } } };
+    const filaColor = { font: { color: { rgb: "000000" } }, fill: { fgColor: { rgb: "F1F8E9" } } };
 
-    for (let i = 0; i < maxHoras; i++) {
-        let fila = [i + 1 + '° Hora']; // Columna "Hora"
-        dias.forEach(dia => {
-            if (horariosPorDia[dia][i]) {
-                fila.push(horariosPorDia[dia][i].hora + ' - ' + horariosPorDia[dia][i].nombre);
-            } else {
-                fila.push(''); // Si no hay más horarios para este día
-            }
-        });
-        filas.push(fila);
+    // Estilos para las celdas de la hoja
+    for (let col = 0; col < tablaHorarios[0].length; col++) {
+        ws[XLSX.utils.encode_cell({ r: 0, c: col })].s = encabezadoColor;  // Encabezado con color
+        for (let row = 1; row < tablaHorarios.length; row++) {
+            ws[XLSX.utils.encode_cell({ r: row, c: col })].s = filaColor;  // Celdas con color de fondo
+        }
     }
 
-    // Crear la hoja de Excel
-    let ws = XLSX.utils.aoa_to_sheet([encabezado, ...filas]);
-
-    // Añadir estilos a las celdas
-    ws['!cols'] = [{wch: 10}, {wch: 15}, {wch: 15}, {wch: 15}, {wch: 15}, {wch: 15}]; // Ancho de las columnas
-    ws['A1'].s = { font: { bold: true, color: { rgb: "FFFFFF" } }, fill: { fgColor: { rgb: "4CAF50" } } }; // Estilo para la celda de la hora
-    dias.forEach((dia, index) => {
-        let col = String.fromCharCode(66 + index); // Columna que corresponde a cada día
-        ws[`${col}1`].s = { font: { bold: true, color: { rgb: "FFFFFF" } }, fill: { fgColor: { rgb: "4CAF50" } } }; // Encabezados de días
-    });
-
-    // Crear el libro de trabajo y agregar la hoja
+    // Crear un libro de trabajo y agregar la hoja
     let wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Horarios");
 
