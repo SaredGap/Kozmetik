@@ -24,6 +24,7 @@ JavaScript (JS) → Lógica para agregar y eliminar horarios.
 FontAwesome → Iconos visuales.
 
 🚀 Potenciales Mejoras Futuras
+
 🔹 Edición de Horarios: Posibilidad de modificar un horario ya agregado.
 
 🔹 Base de Datos: Implementación de almacenamiento en una base de datos para guardar horarios de manera permanente.
