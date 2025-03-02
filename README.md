@@ -17,21 +17,17 @@ El propósito principal de esta agenda es facilitar la organización y administr
 ✅ Espacio para Logo Personalizado: Permite agregar un logo en la parte superior para personalizar la agenda con la identidad visual de la empresa o equipo.
 
 🛠️ Tecnologías Utilizadas
+
 HTML5 → Estructura de la página.
+
 CSS3 → Diseño y estilos personalizados.
+
 Bootstrap 5 → Estilización y compatibilidad responsiva.
+
 JavaScript (JS) → Lógica para agregar y eliminar horarios.
+
 FontAwesome → Iconos visuales.
 
-🚀 Potenciales Mejoras Futuras
-
-🔹 Edición de Horarios: Posibilidad de modificar un horario ya agregado.
-
-🔹 Base de Datos: Implementación de almacenamiento en una base de datos para guardar horarios de manera permanente.
-
-🔹 Filtrado y Búsqueda: Opciones para encontrar horarios específicos rápidamente.
-
-🔹 Exportación e Importación: Guardar y cargar horarios en formato Excel o CSV.
 
 
 📌 Conclusión
