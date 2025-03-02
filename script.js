@@ -95,7 +95,7 @@ function agregarHorario() {
     cargarHorarios();
 }
 
-// Función para exportar los horarios a un archivo Excel con mejor diseño
+// Función para exportar los horarios a un archivo Excel con mejoras
 function exportarExcel() {
     let tablaHorarios = [];
     document.querySelectorAll('.card').forEach(card => {
@@ -103,10 +103,10 @@ function exportarExcel() {
         let filas = card.querySelectorAll('.horario-item');
         
         filas.forEach(fila => {
-            let persona = fila.querySelector('.nombre').innerText;
-            let hora = fila.querySelector('.hora').innerText;
+            let nombre = fila.querySelector('span').innerText.split(' - ')[0];
+            let hora = fila.querySelector('span').innerText.split(' - ')[1];
 
-            tablaHorarios.push({ Día: dia, Nombre: persona, Hora: hora });
+            tablaHorarios.push({ Día: dia, Nombre: nombre, Hora: hora });
         });
     });
 
@@ -115,41 +115,27 @@ function exportarExcel() {
         return;
     }
 
+    // Crear la hoja de Excel
     let ws = XLSX.utils.json_to_sheet(tablaHorarios);
+
+    // Añadir encabezados personalizados
+    ws['!cols'] = [{wch: 10}, {wch: 25}, {wch: 10}]; // Ancho de las columnas
+    ws['A1'].s = { font: { bold: true, color: { rgb: "FFFFFF" } }, fill: { fgColor: { rgb: "4CAF50" } } }; // Estilo para la celda A1 (Día)
+    ws['B1'].s = { font: { bold: true, color: { rgb: "FFFFFF" } }, fill: { fgColor: { rgb: "4CAF50" } } }; // Estilo para la celda B1 (Nombre)
+    ws['C1'].s = { font: { bold: true, color: { rgb: "FFFFFF" } }, fill: { fgColor: { rgb: "4CAF50" } } }; // Estilo para la celda C1 (Hora)
+
+    // Crear un libro de trabajo y agregar la hoja
     let wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Horarios");
 
-    // Establecer diseño con colores y bordes
-    const wscols = [
-        { wpx: 100 }, // Ancho de la columna "Día"
-        { wpx: 200 }, // Ancho de la columna "Nombre"
-        { wpx: 100 }, // Ancho de la columna "Hora"
-    ];
-    ws['!cols'] = wscols;
-
-    // Establecer estilo para el encabezado
-    const encabezadoColor = { font: { bold: true, color: { rgb: "FFFFFF" } }, fill: { fgColor: { rgb: "4CAF50" } } };
-    const filaColor = { font: { color: { rgb: "000000" } }, fill: { fgColor: { rgb: "F1F8E9" } } };
-
-    // Aplicar estilo al encabezado
-    for (let col = 0; col < tablaHorarios[0].length; col++) {
-        ws[XLSX.utils.encode_cell({ r: 0, c: col })].s = encabezadoColor; // Estilo del encabezado
-    }
-
-    // Aplicar estilo a las celdas de los horarios
-    for (let row = 1; row < tablaHorarios.length + 1; row++) {
-        for (let col = 0; col < tablaHorarios[0].length; col++) {
-            ws[XLSX.utils.encode_cell({ r: row, c: col })].s = filaColor; // Estilo para las filas
-        }
-    }
-
-    // Obtener la fecha actual para agregarla al nombre del archivo
+    // Obtener la fecha actual en formato YYYY-MM-DD
     const fecha = new Date();
-    const fechaFormateada = fecha.toISOString().split('T')[0]; // "YYYY-MM-DD"
+    const fechaFormateada = fecha.toISOString().split('T')[0]; // Formato "YYYY-MM-DD"
 
-    // Exportar el archivo con la fecha en el nombre
+    // Descargar el archivo Excel con la fecha en el nombre del archivo
     XLSX.writeFile(wb, `Horarios_${fechaFormateada}.xlsx`);
 }
+
 
 
 // Función para borrar un horario
