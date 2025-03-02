@@ -95,6 +95,61 @@ function agregarHorario() {
     cargarHorarios();
 }
 
+// Función para exportar los horarios a un archivo Excel con mejor diseño
+function exportarExcel() {
+    let tablaHorarios = [];
+    document.querySelectorAll('.card').forEach(card => {
+        let dia = card.querySelector('.card-header').innerText;
+        let filas = card.querySelectorAll('.horario-item');
+        
+        filas.forEach(fila => {
+            let persona = fila.querySelector('.nombre').innerText;
+            let hora = fila.querySelector('.hora').innerText;
+
+            tablaHorarios.push({ Día: dia, Nombre: persona, Hora: hora });
+        });
+    });
+
+    if (tablaHorarios.length === 0) {
+        alert("No hay horarios para exportar.");
+        return;
+    }
+
+    let ws = XLSX.utils.json_to_sheet(tablaHorarios);
+    let wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Horarios");
+
+    // Establecer diseño con colores y bordes
+    const wscols = [
+        { wpx: 100 }, // Ancho de la columna "Día"
+        { wpx: 200 }, // Ancho de la columna "Nombre"
+        { wpx: 100 }, // Ancho de la columna "Hora"
+    ];
+    ws['!cols'] = wscols;
+
+    // Establecer estilo para el encabezado
+    const encabezadoColor = { font: { bold: true, color: { rgb: "FFFFFF" } }, fill: { fgColor: { rgb: "4CAF50" } } };
+    const filaColor = { font: { color: { rgb: "000000" } }, fill: { fgColor: { rgb: "F1F8E9" } } };
+
+    // Aplicar estilo al encabezado
+    for (let col = 0; col < tablaHorarios[0].length; col++) {
+        ws[XLSX.utils.encode_cell({ r: 0, c: col })].s = encabezadoColor; // Estilo del encabezado
+    }
+
+    // Aplicar estilo a las celdas de los horarios
+    for (let row = 1; row < tablaHorarios.length + 1; row++) {
+        for (let col = 0; col < tablaHorarios[0].length; col++) {
+            ws[XLSX.utils.encode_cell({ r: row, c: col })].s = filaColor; // Estilo para las filas
+        }
+    }
+
+    // Obtener la fecha actual para agregarla al nombre del archivo
+    const fecha = new Date();
+    const fechaFormateada = fecha.toISOString().split('T')[0]; // "YYYY-MM-DD"
+
+    // Exportar el archivo con la fecha en el nombre
+    XLSX.writeFile(wb, `Horarios_${fechaFormateada}.xlsx`);
+}
 
 
 // Función para borrar un horario
