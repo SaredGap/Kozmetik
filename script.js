@@ -114,7 +114,7 @@ function exportarExcel() {
             let nombre = fila.querySelector('span').innerText.split(' - ')[0];
             let hora = fila.querySelector('span').innerText.split(' - ')[1];
             
-            // Asegurarnos de que estamos tratando con el objeto correcto
+            // Asegurarnos de que estamos tratando con la hora correcta
             const indexHora = horasDelDia.indexOf(hora);
             if (indexHora !== -1) {
                 // Si la hora no está en el arreglo de horarios, la agregamos
@@ -138,10 +138,10 @@ function exportarExcel() {
     horasDelDia.forEach(hora => {
         let fila = [hora];  // Empezamos con la hora como primer valor de la fila
         for (let dia of ["lunes", "martes", "miércoles", "jueves", "viernes", "sabado", "domingo"]) {
-            // Comprobamos si hay personas para esa hora y día y las agregamos
-            const personas = horarios.find(h => h.hora === hora);
-            if (personas && personas[dia]) {
-                fila.push(personas[dia].join(', '));  // Si hay personas, las unimos por coma
+            // Verificamos si tenemos personas asignadas para ese día y hora
+            const horario = horarios.find(h => h.hora === hora);
+            if (horario && horario[dia]) {
+                fila.push(horario[dia].join(', '));  // Si hay personas, las unimos por coma
             } else {
                 fila.push("");  // Si no hay personas, dejamos vacío
             }
@@ -181,8 +181,6 @@ function exportarExcel() {
     // Descargar el archivo Excel con la fecha en el nombre del archivo
     XLSX.writeFile(wb, `Horarios_${fechaFormateada}.xlsx`);
 }
-
-
 
 
 // Función para borrar un horario
