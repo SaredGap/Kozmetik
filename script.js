@@ -118,23 +118,63 @@ function exportarExcel() {
     // Crear la hoja de Excel
     let ws = XLSX.utils.json_to_sheet(tablaHorarios);
 
-    // Añadir encabezados personalizados
+    // 1. Añadir encabezados personalizados
     ws['!cols'] = [{wch: 10}, {wch: 25}, {wch: 10}]; // Ancho de las columnas
-    ws['A1'].s = { font: { bold: true, color: { rgb: "FFFFFF" } }, fill: { fgColor: { rgb: "4CAF50" } } }; // Estilo para la celda A1 (Día)
-    ws['B1'].s = { font: { bold: true, color: { rgb: "FFFFFF" } }, fill: { fgColor: { rgb: "4CAF50" } } }; // Estilo para la celda B1 (Nombre)
-    ws['C1'].s = { font: { bold: true, color: { rgb: "FFFFFF" } }, fill: { fgColor: { rgb: "4CAF50" } } }; // Estilo para la celda C1 (Hora)
+    ws['A1'].s = { font: { bold: true, color: { rgb: "FFFFFF" } }, fill: { fgColor: { rgb: "4CAF50" } }, alignment: { horizontal: "center", vertical: "center" } }; // Estilo para la celda A1 (Día)
+    ws['B1'].s = { font: { bold: true, color: { rgb: "FFFFFF" } }, fill: { fgColor: { rgb: "4CAF50" } }, alignment: { horizontal: "center", vertical: "center" } }; // Estilo para la celda B1 (Nombre)
+    ws['C1'].s = { font: { bold: true, color: { rgb: "FFFFFF" } }, fill: { fgColor: { rgb: "4CAF50" } }, alignment: { horizontal: "center", vertical: "center" } }; // Estilo para la celda C1 (Hora)
 
-    // Crear un libro de trabajo y agregar la hoja
+    // 2. Bordes y Estilos de Celda
+    const bordes = {
+        top: { style: 'thin', color: { rgb: "000000" } },
+        right: { style: 'thin', color: { rgb: "000000" } },
+        bottom: { style: 'thin', color: { rgb: "000000" } },
+        left: { style: 'thin', color: { rgb: "000000" } }
+    };
+
+    // Aplicar bordes a todas las celdas
+    for (let row = 0; row < tablaHorarios.length + 1; row++) {
+        for (let col = 0; col < 3; col++) {
+            ws[XLSX.utils.encode_cell({ r: row, c: col })].s = { border: bordes };
+        }
+    }
+
+    // 3. Agrupar Horarios por Día
+    let diaAnterior = '';
+    tablaHorarios.forEach((persona, index) => {
+        if (persona.Día !== diaAnterior) {
+            // Añadir una fila vacía como separación entre días
+            if (index > 0) {
+                tablaHorarios.splice(index, 0, { Día: '', Nombre: '', Hora: '' });
+            }
+            diaAnterior = persona.Día;
+        }
+    });
+
+    // Volver a crear la hoja con los horarios agrupados por día
+    let wsAgrupado = XLSX.utils.json_to_sheet(tablaHorarios);
+    
+    // 4. Alineación de texto (centrado)
+    for (let row = 0; row < tablaHorarios.length + 1; row++) {
+        for (let col = 0; col < 3; col++) {
+            wsAgrupado[XLSX.utils.encode_cell({ r: row, c: col })].s = {
+                alignment: { horizontal: "center", vertical: "center" }
+            };
+        }
+    }
+
+    // 5. Crear un libro de trabajo y agregar la hoja con horarios agrupados
     let wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Horarios");
+    XLSX.utils.book_append_sheet(wb, wsAgrupado, "Horarios");
 
-    // Obtener la fecha actual en formato YYYY-MM-DD
+    // 6. Obtener la fecha actual en formato YYYY-MM-DD
     const fecha = new Date();
     const fechaFormateada = fecha.toISOString().split('T')[0]; // Formato "YYYY-MM-DD"
 
-    // Descargar el archivo Excel con la fecha en el nombre del archivo
+    // 7. Descargar el archivo Excel con la fecha en el nombre del archivo
     XLSX.writeFile(wb, `Horarios_${fechaFormateada}.xlsx`);
 }
+
 
 
 
