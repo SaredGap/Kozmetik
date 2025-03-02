@@ -114,12 +114,14 @@ function exportarExcel() {
             let nombre = fila.querySelector('span').innerText.split(' - ')[0];
             let hora = fila.querySelector('span').innerText.split(' - ')[1];
             
-            // Para cada persona, agregamos el nombre en el horario adecuado (en la columna de la hora correspondiente)
+            // Asegurarnos de que estamos tratando con el objeto correcto
             const indexHora = horasDelDia.indexOf(hora);
             if (indexHora !== -1) {
+                // Si la hora no está en el arreglo de horarios, la agregamos
                 if (!horarios[indexHora]) {
                     horarios[indexHora] = { hora: horasDelDia[indexHora] };
                 }
+                // Asegurarnos de que el día existe en el horario
                 if (!horarios[indexHora][dia]) {
                     horarios[indexHora][dia] = [];
                 }
@@ -136,9 +138,13 @@ function exportarExcel() {
     horasDelDia.forEach(hora => {
         let fila = [hora];  // Empezamos con la hora como primer valor de la fila
         for (let dia of ["lunes", "martes", "miércoles", "jueves", "viernes", "sabado", "domingo"]) {
-            // Si hay personas para esa hora y día, las agregamos
-            const personas = horarios.find(h => h.hora === hora) && horarios.find(h => h.hora === hora)[dia];
-            fila.push(personas ? personas.join(', ') : "");  // Si no hay personas, dejamos vacío
+            // Comprobamos si hay personas para esa hora y día y las agregamos
+            const personas = horarios.find(h => h.hora === hora);
+            if (personas && personas[dia]) {
+                fila.push(personas[dia].join(', '));  // Si hay personas, las unimos por coma
+            } else {
+                fila.push("");  // Si no hay personas, dejamos vacío
+            }
         }
         tablaHorarios.push(fila);
     });
@@ -175,6 +181,7 @@ function exportarExcel() {
     // Descargar el archivo Excel con la fecha en el nombre del archivo
     XLSX.writeFile(wb, `Horarios_${fechaFormateada}.xlsx`);
 }
+
 
 
 
