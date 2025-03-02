@@ -95,7 +95,7 @@ function agregarHorario() {
     cargarHorarios();
 }
 
-// Función para exportar los horarios a un archivo Excel
+// Función para exportar los horarios a un archivo Excel con mejoras
 function exportarExcel() {
     let tablaHorarios = [];
     document.querySelectorAll('.card').forEach(card => {
@@ -115,12 +115,27 @@ function exportarExcel() {
         return;
     }
 
+    // Crear la hoja de Excel
     let ws = XLSX.utils.json_to_sheet(tablaHorarios);
+
+    // Añadir encabezados personalizados
+    ws['!cols'] = [{wch: 10}, {wch: 25}, {wch: 10}]; // Ancho de las columnas
+    ws['A1'].s = { font: { bold: true, color: { rgb: "FFFFFF" } }, fill: { fgColor: { rgb: "4CAF50" } } }; // Estilo para la celda A1 (Día)
+    ws['B1'].s = { font: { bold: true, color: { rgb: "FFFFFF" } }, fill: { fgColor: { rgb: "4CAF50" } } }; // Estilo para la celda B1 (Nombre)
+    ws['C1'].s = { font: { bold: true, color: { rgb: "FFFFFF" } }, fill: { fgColor: { rgb: "4CAF50" } } }; // Estilo para la celda C1 (Hora)
+
+    // Crear un libro de trabajo y agregar la hoja
     let wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Horarios");
 
-    XLSX.writeFile(wb, "Horarios.xlsx");
+    // Obtener la fecha actual en formato YYYY-MM-DD
+    const fecha = new Date();
+    const fechaFormateada = fecha.toISOString().split('T')[0]; // Formato "YYYY-MM-DD"
+
+    // Descargar el archivo Excel con la fecha en el nombre del archivo
+    XLSX.writeFile(wb, `Horarios_${fechaFormateada}.xlsx`);
 }
+
 
 // Función para borrar un horario
 function borrarHorario(index) {
