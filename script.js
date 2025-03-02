@@ -247,10 +247,6 @@ function exportarExcel() {
     XLSX.writeFile(wb, `Horarios_${fechaFormateada}.xlsx`);
 }
 
-
-
-
-
 // Función para borrar un horario
 function borrarHorario(index) {
     const horarios = JSON.parse(localStorage.getItem('horarios')) || [];
