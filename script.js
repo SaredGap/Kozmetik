@@ -98,7 +98,7 @@ function agregarHorario() {
 // Función para exportar los horarios a un archivo Excel con mejoras
 function exportarExcel() {
     let tablaHorarios = [];
-    let dias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sabado"]; // Definir días de la semana
+    let dias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"]; // Definir días de la semana
     let horas = [];
     
     // Recorrer las tarjetas y agregar los horarios
@@ -136,7 +136,12 @@ function exportarExcel() {
     const fechaFormateada = fecha.toISOString().split('T')[0]; // Formato "YYYY-MM-DD"
     ws.push([{
         v: `Fecha de Exportación: ${fechaFormateada}`,
-        s: { alignment: { horizontal: 'center' }, font: { bold: true, size: 14 }, fill: { fgColor: { rgb: 'FFB6C1' } } }
+        s: { 
+            alignment: { horizontal: 'center' },
+            font: { bold: true, size: 14 },
+            fill: { fgColor: { rgb: 'FFB6C1' } },
+            border: { top: { style: 'thin' }, bottom: { style: 'thin' } }
+        }
     }]);
 
     // Añadir encabezado de la tabla (Hora y Días)
@@ -183,8 +188,26 @@ function exportarExcel() {
             cell.s = { 
                 font: { bold: true, color: { rgb: "FFFFFF" } },
                 fill: { fgColor: { rgb: "FF69B4" } }, // Color rosa claro
-                alignment: { horizontal: 'center' }
+                alignment: { horizontal: 'center' },
+                border: { top: { style: 'thin' }, bottom: { style: 'thin' } }
             };
+        }
+    }
+
+    // Estilo para las celdas de la hora y los días
+    for (let row = 2; row < wsExcel['!ref'].split(':')[1].replace(/[A-Z]/g, '') + 2; row++) {
+        for (let col = 0; col < wsExcel['!cols'].length; col++) {
+            const cell = wsExcel[XLSX.utils.encode_cell({r: row, c: col})];
+            if (cell) {
+                cell.s = { 
+                    border: { 
+                        top: { style: 'thin' },
+                        bottom: { style: 'thin' },
+                        left: { style: 'thin' },
+                        right: { style: 'thin' }
+                    }
+                };
+            }
         }
     }
 
