@@ -66,35 +66,6 @@ function cargarHorarios() {
     }
 }
 
-// Función para agregar un nuevo horario
-function agregarHorario() {
-    const persona = document.getElementById("persona").value;
-    const dia = document.getElementById("dia").value;
-    const hora = document.getElementById("hora").value;
-
-    if (persona === "" || dia === "" || hora === "") {
-        alert("Por favor, complete todos los campos.");
-        return;
-    }
-
-    const horarios = JSON.parse(localStorage.getItem('horarios')) || [];
-
-    const nuevoHorario = {
-        persona: persona,
-        dia: dia,
-        hora: hora
-    };
-
-    horarios.push(nuevoHorario);
-    localStorage.setItem('horarios', JSON.stringify(horarios));
-
-    document.getElementById("persona").value = "";
-    document.getElementById("dia").value = "";
-    document.getElementById("hora").value = "";
-
-    cargarHorarios();
-}
-
 function calcularHorasTrabajadas() {
     let horasPorPersona = {}; // Objeto para almacenar las horas trabajadas por persona
     let filas = document.querySelectorAll('.horario-item');
@@ -146,6 +117,37 @@ function calcularHorasTrabajadas() {
 
     document.getElementById("resumenHoras").innerHTML = resultadoHTML;
 }
+
+// Función para agregar un nuevo horario
+function agregarHorario() {
+    const persona = document.getElementById("persona").value;
+    const dia = document.getElementById("dia").value;
+    const hora = document.getElementById("hora").value;
+
+    if (persona === "" || dia === "" || hora === "") {
+        alert("Por favor, complete todos los campos.");
+        return;
+    }
+
+    const horarios = JSON.parse(localStorage.getItem('horarios')) || [];
+
+    const nuevoHorario = {
+        persona: persona,
+        dia: dia,
+        hora: hora
+    };
+
+    horarios.push(nuevoHorario);
+    localStorage.setItem('horarios', JSON.stringify(horarios));
+
+    document.getElementById("persona").value = "";
+    document.getElementById("dia").value = "";
+    document.getElementById("hora").value = "";
+
+    cargarHorarios();
+}
+
+
 
 
 // Función para exportar los horarios a un archivo Excel con mejoras
