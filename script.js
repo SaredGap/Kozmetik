@@ -66,58 +66,6 @@ function cargarHorarios() {
     }
 }
 
-function calcularHorasTrabajadas() {
-    let horasPorPersona = {}; // Objeto para almacenar las horas trabajadas por persona
-    let filas = document.querySelectorAll('.horario-item');
-
-    if (filas.length === 0) {
-        document.getElementById("resumenHoras").innerHTML = "<p>No hay horarios registrados.</p>";
-        return;
-    }
-
-    filas.forEach(fila => {
-        let span = fila.querySelector('span');
-        if (!span) return; // Si no encuentra el span, evita errores
-
-        let texto = span.innerText.trim();
-        let partes = texto.split(' - ');
-
-        if (partes.length < 2) return; // Ignorar si el formato no es correcto
-
-        let nombre = partes[0].trim();
-        let horasTexto = partes[1].trim();
-
-        // Extraer horas con regex
-        let horasPartes = horasTexto.match(/(\d{1,2}):(\d{2})\s*a\s*(\d{1,2}):(\d{2})/);
-
-        if (!horasPartes) return; // Si no coincide con el formato, ignorar
-
-        let horaInicio = parseInt(horasPartes[1]) + parseInt(horasPartes[2]) / 60;
-        let horaFin = parseInt(horasPartes[3]) + parseInt(horasPartes[4]) / 60;
-
-        let horasTrabajadas = horaFin - horaInicio;
-
-        if (!horasPorPersona[nombre]) {
-            horasPorPersona[nombre] = 0;
-        }
-        horasPorPersona[nombre] += horasTrabajadas;
-    });
-
-    // Generar HTML con los resultados
-    let resultadoHTML = "<h3>Horas Trabajadas por Persona</h3>";
-    if (Object.keys(horasPorPersona).length === 0) {
-        resultadoHTML += "<p>No se encontraron horarios válidos.</p>";
-    } else {
-        resultadoHTML += "<ul>";
-        for (let persona in horasPorPersona) {
-            resultadoHTML += `<li><strong>${persona}:</strong> ${horasPorPersona[persona].toFixed(2)} horas</li>`;
-        }
-        resultadoHTML += "</ul>";
-    }
-
-    document.getElementById("resumenHoras").innerHTML = resultadoHTML;
-}
-
 // Función para agregar un nuevo horario
 function agregarHorario() {
     const persona = document.getElementById("persona").value;
