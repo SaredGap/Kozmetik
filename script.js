@@ -110,13 +110,13 @@ function exportarExcel() {
             let nombre = fila.querySelector('span').innerText.split(' - ')[0];
             let hora = fila.querySelector('span').innerText.split(' - ')[1];
 
+            // Agregar todos los horarios sin eliminar duplicados
+            tablaHorarios.push({ Día: dia, Nombre: nombre, Hora: hora });
+
             // Si no existe la hora en el array de horas, agregarla
             if (!horas.includes(hora)) {
                 horas.push(hora);
             }
-
-            // Agregar el horario al arreglo
-            tablaHorarios.push({ Día: dia, Nombre: nombre, Hora: hora });
         });
     });
 
@@ -148,8 +148,14 @@ function exportarExcel() {
 
         // Llenar la fila con los nombres correspondientes a cada día de la semana
         dias.forEach(dia => {
-            let persona = tablaHorarios.find(item => item.Hora === hora && item.Día === dia);
-            fila.push(persona ? persona.Nombre : ""); // Si no hay persona asignada, dejar vacío
+            let personas = tablaHorarios.filter(item => item.Hora === hora && item.Día === dia);
+            if (personas.length > 0) {
+                // Si hay varias personas, poner todas en la celda
+                let nombres = personas.map(item => item.Nombre).join(", ");
+                fila.push(nombres);
+            } else {
+                fila.push(""); // Si no hay persona asignada, dejar vacío
+            }
         });
 
         ws.push(fila);
@@ -188,6 +194,7 @@ function exportarExcel() {
     // Descargar el archivo Excel
     XLSX.writeFile(wb, `Horarios_${fechaFormateada}.xlsx`);
 }
+
 
 
 // Función para borrar un horario
