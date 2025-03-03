@@ -96,7 +96,7 @@ function agregarHorario() {
 }
 
 function calcularHorasTrabajadas() {
-    let horasPorPersona = {}; // Objeto para almacenar horas por persona
+    let horasPorPersona = {}; // Objeto para almacenar las horas trabajadas por cada persona
 
     document.querySelectorAll('.horario-item').forEach(fila => {
         let nombre = fila.querySelector('span').innerText.split(' - ')[0];
@@ -115,15 +115,16 @@ function calcularHorasTrabajadas() {
         horasPorPersona[nombre] += horasTrabajadas;
     });
 
-    // Mostrar en la web
-    let resultado = "<h3>Horas Trabajadas por Persona</h3><ul>";
+    // Mostrar resultados en la web
+    let resultadoHTML = "<h3>Horas Trabajadas por Persona</h3><ul>";
     for (let persona in horasPorPersona) {
-        resultado += `<li>${persona}: ${horasPorPersona[persona].toFixed(2)} horas</li>`;
+        resultadoHTML += `<li><strong>${persona}:</strong> ${horasPorPersona[persona].toFixed(2)} horas</li>`;
     }
-    resultado += "</ul>";
+    resultadoHTML += "</ul>";
 
-    document.getElementById("resumenHoras").innerHTML = resultado;
+    document.getElementById("resumenHoras").innerHTML = resultadoHTML;
 }
+
 
 
 // Función para exportar los horarios a un archivo Excel con mejoras
