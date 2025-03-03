@@ -95,38 +95,6 @@ function agregarHorario() {
     cargarHorarios();
 }
 
-function calcularHorasTrabajadas() {
-    let horasPorPersona = {}; // Objeto para almacenar las horas trabajadas por cada persona
-
-    document.querySelectorAll('.horario-item').forEach(fila => {
-        let nombre = fila.querySelector('span').innerText.split(' - ')[0];
-        let hora = fila.querySelector('span').innerText.split(' - ')[1];
-
-        let [horaInicio, horaFin] = hora.split(" a ").map(h => {
-            let [h, m] = h.split(":").map(Number);
-            return h + (m / 60); // Convertir a formato decimal
-        });
-
-        let horasTrabajadas = horaFin - horaInicio;
-
-        if (!horasPorPersona[nombre]) {
-            horasPorPersona[nombre] = 0;
-        }
-        horasPorPersona[nombre] += horasTrabajadas;
-    });
-
-    // Mostrar resultados en la web
-    let resultadoHTML = "<h3>Horas Trabajadas por Persona</h3><ul>";
-    for (let persona in horasPorPersona) {
-        resultadoHTML += `<li><strong>${persona}:</strong> ${horasPorPersona[persona].toFixed(2)} horas</li>`;
-    }
-    resultadoHTML += "</ul>";
-
-    document.getElementById("resumenHoras").innerHTML = resultadoHTML;
-}
-
-
-
 // Función para exportar los horarios a un archivo Excel con mejoras
 function exportarExcel() {
     let tablaHorarios = [];
@@ -225,6 +193,44 @@ function exportarExcel() {
 
     // Descargar el archivo Excel
     XLSX.writeFile(wb, `Horarios_${fechaFormateada}.xlsx`);
+}
+
+function calcularHorasTrabajadas() {
+    let horasPorPersona = {}; // Objeto para almacenar las horas trabajadas por persona
+
+    document.querySelectorAll('.horario-item').forEach(fila => {
+        let texto = fila.querySelector('span').innerText;
+        let partes = texto.split(' - ');
+
+        if (partes.length < 2) return; // Evita errores si el formato es incorrecto
+
+        let nombre = partes[0].trim();
+        let horasTexto = partes[1].trim();
+
+        // Asegurar que tiene formato "HH:MM a HH:MM"
+        let horasPartes = horasTexto.match(/(\d{1,2}):(\d{2})\s*a\s*(\d{1,2}):(\d{2})/);
+
+        if (!horasPartes) return; // Si no coincide con el formato, ignorar
+
+        let horaInicio = parseInt(horasPartes[1]) + parseInt(horasPartes[2]) / 60;
+        let horaFin = parseInt(horasPartes[3]) + parseInt(horasPartes[4]) / 60;
+
+        let horasTrabajadas = horaFin - horaInicio;
+
+        if (!horasPorPersona[nombre]) {
+            horasPorPersona[nombre] = 0;
+        }
+        horasPorPersona[nombre] += horasTrabajadas;
+    });
+
+    // Mostrar resultados en la web
+    let resultadoHTML = "<h3>Horas Trabajadas por Persona</h3><ul>";
+    for (let persona in horasPorPersona) {
+        resultadoHTML += `<li><strong>${persona}:</strong> ${horasPorPersona[persona].toFixed(2)} horas</li>`;
+    }
+    resultadoHTML += "</ul>";
+
+    document.getElementById("resumenHoras").innerHTML = resultadoHTML;
 }
 
 
