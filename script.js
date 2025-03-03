@@ -95,6 +95,37 @@ function agregarHorario() {
     cargarHorarios();
 }
 
+function calcularHorasTrabajadas() {
+    let horasPorPersona = {}; // Objeto para almacenar horas por persona
+
+    document.querySelectorAll('.horario-item').forEach(fila => {
+        let nombre = fila.querySelector('span').innerText.split(' - ')[0];
+        let hora = fila.querySelector('span').innerText.split(' - ')[1];
+
+        let [horaInicio, horaFin] = hora.split(" a ").map(h => {
+            let [h, m] = h.split(":").map(Number);
+            return h + (m / 60); // Convertir a formato decimal
+        });
+
+        let horasTrabajadas = horaFin - horaInicio;
+
+        if (!horasPorPersona[nombre]) {
+            horasPorPersona[nombre] = 0;
+        }
+        horasPorPersona[nombre] += horasTrabajadas;
+    });
+
+    // Mostrar en la web
+    let resultado = "<h3>Horas Trabajadas por Persona</h3><ul>";
+    for (let persona in horasPorPersona) {
+        resultado += `<li>${persona}: ${horasPorPersona[persona].toFixed(2)} horas</li>`;
+    }
+    resultado += "</ul>";
+
+    document.getElementById("resumenHoras").innerHTML = resultado;
+}
+
+
 // Función para exportar los horarios a un archivo Excel con mejoras
 function exportarExcel() {
     let tablaHorarios = [];
