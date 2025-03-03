@@ -40,10 +40,13 @@
                     </div>
                 </div>
                 <button type="button" class="btn btn-primary agregar-btn" onclick="agregarHorario()">Agregar</button>
-               <div id="resumenHoras"></div>
+             
                 <button type="button" class="btn btn-success agregar-btn" onclick="exportarExcel()">Exportar a Excel <i class="fas fa-file-excel"></i></button>
             </form>
         </div>
+        <div id="resumenHoras"></div>
+<button onclick="calcularHorasTrabajadas()">Calcular Horas</button>
+
 
         <!-- Contenedor donde se mostrarán los horarios -->
         <div id="horariosContainer" class="row mt-5"></div>
