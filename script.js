@@ -98,6 +98,10 @@ function agregarHorario() {
 // Función para exportar los horarios a un archivo Excel con mejoras
 function exportarExcel() {
     let tablaHorarios = [];
+    let dias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"]; // Definir días de la semana
+    let horas = [];
+
+    // Recorrer las tarjetas y agregar los horarios
     document.querySelectorAll('.card').forEach(card => {
         let dia = card.querySelector('.card-header').innerText;
         let filas = card.querySelectorAll('.horario-item');
@@ -106,6 +110,12 @@ function exportarExcel() {
             let nombre = fila.querySelector('span').innerText.split(' - ')[0];
             let hora = fila.querySelector('span').innerText.split(' - ')[1];
 
+            // Verificar si la hora ya existe, si no, agregarla al array de horas
+            if (!horas.includes(hora)) {
+                horas.push(hora);
+            }
+
+            // Agregar el horario al arreglo
             tablaHorarios.push({ Día: dia, Nombre: nombre, Hora: hora });
         });
     });
@@ -115,65 +125,69 @@ function exportarExcel() {
         return;
     }
 
+    // Ordenar las horas de menor a mayor
+    horas.sort();
+
     // Crear la hoja de Excel
-    let ws = XLSX.utils.json_to_sheet(tablaHorarios);
+    let ws = [];
 
-    // 1. Añadir encabezados personalizados
-    ws['!cols'] = [{wch: 10}, {wch: 25}, {wch: 10}]; // Ancho de las columnas
-    ws['A1'].s = { font: { bold: true, color: { rgb: "FFFFFF" } }, fill: { fgColor: { rgb: "4CAF50" } }, alignment: { horizontal: "center", vertical: "center" } }; // Estilo para la celda A1 (Día)
-    ws['B1'].s = { font: { bold: true, color: { rgb: "FFFFFF" } }, fill: { fgColor: { rgb: "4CAF50" } }, alignment: { horizontal: "center", vertical: "center" } }; // Estilo para la celda B1 (Nombre)
-    ws['C1'].s = { font: { bold: true, color: { rgb: "FFFFFF" } }, fill: { fgColor: { rgb: "4CAF50" } }, alignment: { horizontal: "center", vertical: "center" } }; // Estilo para la celda C1 (Hora)
+    // Añadir una celda grande para la fecha
+    const fecha = new Date();
+    const fechaFormateada = fecha.toISOString().split('T')[0]; // Formato "YYYY-MM-DD"
+    ws.push([{
+        v: `Fecha de Exportación: ${fechaFormateada}`,
+        s: { alignment: { horizontal: 'center' }, font: { bold: true, size: 14 }, fill: { fgColor: { rgb: 'FFB6C1' } } }
+    }]);
 
-    // 2. Bordes y Estilos de Celda
-    const bordes = {
-        top: { style: 'thin', color: { rgb: "000000" } },
-        right: { style: 'thin', color: { rgb: "000000" } },
-        bottom: { style: 'thin', color: { rgb: "000000" } },
-        left: { style: 'thin', color: { rgb: "000000" } }
-    };
+    // Añadir encabezado de la tabla (Días)
+    ws.push(["Hora", ...dias]);
 
-    // Aplicar bordes a todas las celdas
-    for (let row = 0; row < tablaHorarios.length + 1; row++) {
-        for (let col = 0; col < 3; col++) {
-            ws[XLSX.utils.encode_cell({ r: row, c: col })].s = { border: bordes };
-        }
-    }
+    // Rellenar las filas de la tabla con los horarios
+    horas.forEach(hora => {
+        let fila = [hora];
 
-    // 3. Agrupar Horarios por Día
-    let diaAnterior = '';
-    tablaHorarios.forEach((persona, index) => {
-        if (persona.Día !== diaAnterior) {
-            // Añadir una fila vacía como separación entre días
-            if (index > 0) {
-                tablaHorarios.splice(index, 0, { Día: '', Nombre: '', Hora: '' });
-            }
-            diaAnterior = persona.Día;
-        }
+        dias.forEach(dia => {
+            let persona = tablaHorarios.find(item => item.Hora === hora && item.Día === dia);
+            fila.push(persona ? persona.Nombre : ""); // Si no hay persona asignada, dejar vacío
+        });
+
+        ws.push(fila);
     });
 
-    // Volver a crear la hoja con los horarios agrupados por día
-    let wsAgrupado = XLSX.utils.json_to_sheet(tablaHorarios);
-    
-    // 4. Alineación de texto (centrado)
-    for (let row = 0; row < tablaHorarios.length + 1; row++) {
-        for (let col = 0; col < 3; col++) {
-            wsAgrupado[XLSX.utils.encode_cell({ r: row, c: col })].s = {
-                alignment: { horizontal: "center", vertical: "center" }
+    // Crear un libro de trabajo y agregar la hoja
+    let wb = XLSX.utils.book_new();
+    let wsExcel = XLSX.utils.aoa_to_sheet(ws);
+
+    // Configurar los anchos de las columnas
+    wsExcel['!cols'] = [
+        {wch: 10},  // Ancho de columna para "Hora"
+        {wch: 15},  // Ancho de columna para "Lunes"
+        {wch: 15},  // Ancho de columna para "Martes"
+        {wch: 15},  // Ancho de columna para "Miércoles"
+        {wch: 15},  // Ancho de columna para "Jueves"
+        {wch: 15},  // Ancho de columna para "Viernes"
+        {wch: 15}   // Ancho de columna para "Sábado"
+    ];
+
+    // Aplicar estilo de colores rosados a los encabezados
+    for (let col = 1; col <= dias.length; col++) {
+        const cell = wsExcel[XLSX.utils.encode_cell({r: 1, c: col})];
+        if (cell) {
+            cell.s = { 
+                font: { bold: true, color: { rgb: "FFFFFF" } },
+                fill: { fgColor: { rgb: "FF69B4" } }, // Color rosa claro
+                alignment: { horizontal: 'center' }
             };
         }
     }
 
-    // 5. Crear un libro de trabajo y agregar la hoja con horarios agrupados
-    let wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, wsAgrupado, "Horarios");
+    // Crear el libro y agregar la hoja
+    XLSX.utils.book_append_sheet(wb, wsExcel, "Horarios");
 
-    // 6. Obtener la fecha actual en formato YYYY-MM-DD
-    const fecha = new Date();
-    const fechaFormateada = fecha.toISOString().split('T')[0]; // Formato "YYYY-MM-DD"
-
-    // 7. Descargar el archivo Excel con la fecha en el nombre del archivo
+    // Descargar el archivo Excel
     XLSX.writeFile(wb, `Horarios_${fechaFormateada}.xlsx`);
 }
+
 
 
 // Función para borrar un horario
