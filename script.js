@@ -100,7 +100,7 @@ function exportarExcel() {
     let tablaHorarios = [];
     let dias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"]; // Definir días de la semana
     let horas = [];
-
+    
     // Recorrer las tarjetas y agregar los horarios
     document.querySelectorAll('.card').forEach(card => {
         let dia = card.querySelector('.card-header').innerText;
@@ -110,7 +110,7 @@ function exportarExcel() {
             let nombre = fila.querySelector('span').innerText.split(' - ')[0];
             let hora = fila.querySelector('span').innerText.split(' - ')[1];
 
-            // Verificar si la hora ya existe, si no, agregarla al array de horas
+            // Si no existe la hora en el array de horas, agregarla
             if (!horas.includes(hora)) {
                 horas.push(hora);
             }
@@ -139,13 +139,14 @@ function exportarExcel() {
         s: { alignment: { horizontal: 'center' }, font: { bold: true, size: 14 }, fill: { fgColor: { rgb: 'FFB6C1' } } }
     }]);
 
-    // Añadir encabezado de la tabla (Días)
+    // Añadir encabezado de la tabla (Hora y Días)
     ws.push(["Hora", ...dias]);
 
     // Rellenar las filas de la tabla con los horarios
     horas.forEach(hora => {
         let fila = [hora];
 
+        // Llenar la fila con los nombres correspondientes a cada día de la semana
         dias.forEach(dia => {
             let persona = tablaHorarios.find(item => item.Hora === hora && item.Día === dia);
             fila.push(persona ? persona.Nombre : ""); // Si no hay persona asignada, dejar vacío
@@ -187,7 +188,6 @@ function exportarExcel() {
     // Descargar el archivo Excel
     XLSX.writeFile(wb, `Horarios_${fechaFormateada}.xlsx`);
 }
-
 
 
 // Función para borrar un horario
