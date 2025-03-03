@@ -98,7 +98,7 @@ function agregarHorario() {
 // Función para exportar los horarios a un archivo Excel con mejoras
 function exportarExcel() {
     let tablaHorarios = [];
-    let dias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"]; // Definir días de la semana
+    let dias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sabado"]; // Definir días de la semana
     let horas = [];
     
     // Recorrer las tarjetas y agregar los horarios
@@ -213,7 +213,7 @@ function repetirHorario(index) {
 
     const nuevoDia = prompt("Ingresa el nuevo día para repetir el horario (por ejemplo, 'martes'):");
 
-    if (!nuevoDia || !['lunes', 'martes', 'miércoles', 'jueves', 'viernes'].includes(nuevoDia.toLowerCase())) {
+    if (!nuevoDia || !['lunes', 'martes', 'miercoles', 'jueves', 'viernes','sabado','domingo' ].includes(nuevoDia.toLowerCase())) {
         alert("Día inválido. Por favor, ingresa un día válido.");
         return;
     }
